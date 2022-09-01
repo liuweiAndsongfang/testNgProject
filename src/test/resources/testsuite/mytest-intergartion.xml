@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="myTest" verbose="1" preserve-order="true">
+    <listeners>
+        <listener class-name="org.testng.reporters.FailedReporter"></listener>
+    </listeners>
+
+    <test name="mytest" >
+        <classes>
+            <class name = "com.liuwei.testng.testLoadBankInfo"></class>
+            <class name = "com.liuwei.testng.TestTest"></class>
+        </classes>
+    </test>
+</suite>

@@ -1,0 +1,24 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+  
+<suite name="Suite1" verbose="1" >
+  <parameter name="test1" value="Tank" />
+  <parameter name="test1" value="Xiao" />
+  <test name="Nopackage" preserve-order="true"><!-- true保证节点下面的方法是按顺序执行-->
+    <classes>
+       <class name="com.liuwei.testng.TestTest" >
+        <methods>
+          <include name="TestNgLearn2"/>
+        </methods>
+       </class>
+    </classes>
+  </test>
+  <test name="DataProvider" preserve-order="true"><!-- true保证节点下面的方法是按顺序执行-->
+    <classes>
+      <class name="com.liuwei.testng.TestTest" >
+        <methods>
+          <include name="ParaTest"/>
+        </methods>
+      </class>
+    </classes>
+  </test>
+</suite>
