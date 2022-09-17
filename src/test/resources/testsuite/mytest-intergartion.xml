@@ -6,7 +6,7 @@
 
     <test name="mytest" >
         <classes>
-            <class name = "com.liuwei.testng.testLoadBankInfo"></class>
+            <class name = "com.liuwei.testng.mobile.testLoadBankInfo"></class>
             <class name = "com.liuwei.testng.TestTest"></class>
         </classes>
     </test>

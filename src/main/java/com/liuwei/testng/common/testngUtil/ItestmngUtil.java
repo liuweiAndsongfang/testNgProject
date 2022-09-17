@@ -22,9 +22,9 @@ public class ItestmngUtil {
     }
 
     public static String getTestCases(Map<String, String> params) throws IOException {
-        String host = System.getProperty("itest.itestmng_host");
+        String host = System.getProperty("REPORT_HOST");
         if (StringUtil.isEmpty(host)) {
-            host = "jarvis.alipay.net";
+            host = "localhost:8081";
         }
 
         String serverUrl = "http://" + host + "/itestmng/api/query/allExecuteCases";
@@ -33,9 +33,9 @@ public class ItestmngUtil {
 
     public static void uploadCaseResult(JSONObject caseObject, String status, ITestResult testResult) {
         if (caseObject != null) {
-            String host = System.getProperty("itest.itestmng_host");
+            String host = System.getProperty("REPORT_HOST");
             if (StringUtil.isEmpty(host)) {
-                host = "jarvis.alipay.net";
+                host = "localhost:8081";
             }
 
             if (!ListenerContext.getSkipIds().contains(caseObject.getString("caseId"))) {
