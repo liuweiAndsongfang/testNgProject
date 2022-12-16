@@ -1,0 +1,50 @@
+#以下配置为aqc上运行实验室所需配置,每项的配置支持的值，老系统以aqc上的为准：http://aqc.alipay.net/auto/labList.htm；
+#此文件不用随意修改，否则会导致用例运行失败
+#optional, ce 支持，如果不存在，置为空
+ce: 4.4.5.2
+
+#must, jdk 枚举值支持： jdk1.7.0_76、jdk1.6.0_33、jdk1.6.0_21、ajdk-8_1_1_fp1-b52
+jdk: ajdk-8_1_1_fp1-b52
+
+#must, mvn 支持2.2.1、3.0.3、3.2.5
+maven: 3.2.5
+
+#optional，oracle 支持11.2.0.3、10.2.0.3
+oracle: 11.2.0.3
+
+#optional, 分发配置模式（这个在aci上运行时生效），SINGLE/AVG_GROUP 代表单台执行机执行/平均分发到多个执行机执行
+allocationMode: SINGLE
+
+
+#optional, 已废弃，实验室分发策略（aqc上运行时生效）,平均分发/不拆分运行/分组运行
+runStrategy: 平均分发
+
+#must, 运行实验室需要绑定的host,如果有多个，传list
+hosts:
+  - 11.162.170.34 JhdKpdEK195209762p3306.58test.antcloud.net
+  - 100.64.123.87 dev.ch6vdmcv0tai.af-south-1.rds.amazonaws.com
+#  - 100.64.54.142 test1.ch6vdmcv0tai.af-south-1.rds.amazonaws.com
+  - 100.64.48.158 test1.ch6vdmcv0tai.af-south-1.rds.amazonaws.com
+  # - 100.64.50.50 sit.ch6vdmcv0tai.af-south-1.rds.amazonaws.com
+
+#must, 覆盖率统计排除类
+exclusions: '**/test/**,**/dal/**,**/model/**,**/dto/**,**/enum/**'
+
+#must, sonar 配置，pmd扫描sonar启动需要这些参数,包含拉取jar包所需配置、sonar 扫描排除类配置等
+sonarConfig: -Dclassifier.name=ap -Dsources.classifier.name=ap-id-sources -Dsonar.exclusions=**/test/**,**/mock/**,**/dal/**,**/facade/**
+
+#必填，运行实验室命令,多行的话，传list
+cmd:
+  - rm -rf /home/admin/.m2/settings.xml
+  - export LC_ALL=en_US.UTF-8
+  - export LANG=en_US.UTF-8
+  - rm -rf /home/admin/.m2
+  - pwd
+  - mvn clean test -e -Ddbmode=awssit -Dparallel=classes -DthreadCount=1 -Dconfigurefailurepolicy=continue -DmachineEncoding=UTF8  -Ditest.upload_log=true  -DrunTestCase=/  -DtestExcludeCase=/  -DfailIfNoTests=false  -Ditest.itestmng_host=jarvis.alipay.net
+
+#可选，用于配置要执行的用例范围，includes和excludes配套出现，支持path、group和id三种格式
+includes:
+  - path@com.liuwei.testng.mobile
+  - path@com.liuwei.testng.member
+
+excludes:
