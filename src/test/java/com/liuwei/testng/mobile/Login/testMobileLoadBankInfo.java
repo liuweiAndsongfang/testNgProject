@@ -17,7 +17,7 @@ public class testMobileLoadBankInfo extends TestBase {
 
         System.out.print("12345222"+"\n");
         Map<String,String> paramMap = new HashMap<>();
-        checkRegister.checkNumberRegister("testLoginLoadBank");
+        checkRegister.checkNumberRegister("123123");
         //return paramMap;
     }
 

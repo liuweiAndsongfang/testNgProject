@@ -40,10 +40,15 @@ public class ItestmngUtil {
 
             if (!ListenerContext.getSkipIds().contains(caseObject.getString("caseId"))) {
                 try {
+                    //此处需要对batchid和executeId进行上报
+                    String batchId = System.getProperty("batch_id");
+                    String executeId = System.getProperty("execution_id");
                     ConsoleLogger.info(LogMonitor.END_RECORD_LOG, new Object[0]);
                     String caseLog = "IGNORE".equalsIgnoreCase(status) ? "" : LogMonitor.dump();
                     String serverUrl = "http://" + host + "/itestmng/api/uploadResult";
                     boolean success = false;
+                    caseObject.put("batchId", batchId);
+                    caseObject.put("executeId", executeId);
                     caseObject.put("result", status);
                     caseObject.put("testMode", ListenerContext.getExecuteOption().getTestMode());
                     caseObject.put("timeout", testResult.getEndMillis() - testResult.getStartMillis());
