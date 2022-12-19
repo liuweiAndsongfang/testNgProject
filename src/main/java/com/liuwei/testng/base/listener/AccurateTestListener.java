@@ -1,6 +1,7 @@
 package com.liuwei.testng.base.listener;
 
 import com.alibaba.fastjson.JSONObject;
+import com.liuwei.testng.base.LogUtils;
 import com.liuwei.testng.common.StringUtil;
 import com.liuwei.testng.common.testngUtil.ClientUtil;
 import com.liuwei.testng.common.testngUtil.ConsoleLogger;
@@ -17,13 +18,12 @@ public class AccurateTestListener extends TestListenerAdapter {
     public static final String MANUAL_SKIP = "MANUAL_SKIP";
     public static final List<String> JUNIT_TEST_METHOD_LIST = new ArrayList();
 
-    public AccurateTestListener() {
-    }
 
     public void onTestSuccess(ITestResult testResult) {
         ConsoleLogger.info("ITestNGListener: ITestListener --> onTestSuccess[" + testResult.getMethod().getRealClass().getName() + "." + testResult.getMethod().getConstructorOrMethod().getName() + "][" + testResult.getMethod().getClass().getName() + "]", new Object[0]);
         JSONObject caseObject = ListenerContext.parseTestCase(testResult);
         if (caseObject != null) {
+            LogUtils.info(caseObject.toJSONString());
             ClientUtil.uploadCaseResult(caseObject, "SUCCESS", testResult);
         }
     }
