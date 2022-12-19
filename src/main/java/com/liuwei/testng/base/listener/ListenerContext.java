@@ -108,7 +108,7 @@ public class ListenerContext {
                         caseObject.put("traceId",System.currentTimeMillis()+"");
                         caseObject.put("batchId",getBatchId());
                         getCaseMap().put(caseId, caseObject);
-                        if("accurate".equalsIgnoreCase(getExecuteOption().getTestMode())){
+                        if(!"accurate".equalsIgnoreCase(getExecuteOption().getTestMode())){
                             getCaseIds().add(caseId);
                         }
                         if(caseId.matches("^.*@\\d+$")){
@@ -124,6 +124,8 @@ public class ListenerContext {
                         }
                     }
                     if(caseObject != null){
+                        //这里需要加上执行id
+                        caseObject.put("executionId",getExecutionId());
                         caseObject.put("caseName",caseName);
                         caseObject.put("testMethod",testMethod);
                         caseObject.put("casePath",casePath);
@@ -288,6 +290,7 @@ public class ListenerContext {
         return caseMap;
     }
     public static String getBatchId(){return  executeOption.getBatchId();}
+    public static String getExecutionId(){return  executeOption.getExecutionId();}
     public static ExecuteOption getExecuteOption(){
         return executeOption;
     }
