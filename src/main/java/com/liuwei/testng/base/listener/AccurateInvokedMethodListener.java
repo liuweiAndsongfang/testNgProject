@@ -1,11 +1,19 @@
 package com.liuwei.testng.base.listener;
 
 import com.alibaba.fastjson.JSONObject;
+
+import com.liuwei.testng.base.LogUtils;
 import com.liuwei.testng.common.testngUtil.ConsoleLogger;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ITestResult;
 import org.testng.SkipException;
+import org.testng.annotations.Test;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.Map;
 
 public class AccurateInvokedMethodListener implements IInvokedMethodListener {
     @Override
@@ -16,7 +24,7 @@ public class AccurateInvokedMethodListener implements IInvokedMethodListener {
             if (this.skipTest(caseObject)) {
                 ListenerContext.getSkipIds().add(caseObject.getString("caseId"));
                 ConsoleLogger.warn("[ACCURATE_SKIP] [" + caseObject.get("caseId") + "]", new Object[0]);
-                //this.pushProxyDataProviderNext(testResult);
+                pushProxyDataProviderNext(testResult);
                 throw new SkipException("ACCURATE_SKIP");
             }
 
@@ -46,12 +54,15 @@ public class AccurateInvokedMethodListener implements IInvokedMethodListener {
         try {
             String caseType = caseObject.getString("caseType");
             String casePath = caseObject.getString("casePath");
+            LogUtils.info("执行的case的casePath is:"+casePath);
             if ("ITEST".equalsIgnoreCase(caseType) && !ListenerContext.getCaseIds().isEmpty()) {
                 return this.skipAccurateTest(caseObject);
             } else if (ListenerContext.getTestMethods().isEmpty()) {
                 return false;
             } else {
-                return !ListenerContext.getTestMethods().contains(casePath);
+                boolean iscContain = ListenerContext.getTestMethods().contains(casePath);
+                LogUtils.info("执行的case is:"+casePath +";是否被包含"+iscContain);
+                return !iscContain;
             }
         } catch (Exception var4) {
             ConsoleLogger.error("skip remote test exception, e=[" +
@@ -77,5 +88,40 @@ public class AccurateInvokedMethodListener implements IInvokedMethodListener {
             ConsoleLogger.error("skip accurate test exception, e=["  + "]", new Object[0]);
             return false;
         }
+    }
+
+    private void pushProxyDataProviderNext(ITestResult testResult) {
+        try {
+            Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
+            if (method.isAnnotationPresent(Test.class)) {
+                String dataProvider = ((Test)method.getAnnotation(Test.class)).dataProvider();
+                if (dataProvider == null || dataProvider.isEmpty()) {
+                    return;
+                }
+
+                Object instance = testResult.getInstance();
+                Field field = instance.getClass().getDeclaredField("CGLIB$CALLBACK_0");
+                if (field != null) {
+                    field.setAccessible(true);
+                    Object proxy = field.get(instance);
+                    if (proxy != null) {
+                        field = proxy.getClass().getDeclaredField("data");
+                        if (field != null) {
+                            field.setAccessible(true);
+                            ThreadLocal data = (ThreadLocal)field.get(proxy);
+                            if (data != null && data.get() != null) {
+                                Iterator iterator = (Iterator)((Map)data.get()).get(dataProvider);
+                                if (iterator != null) {
+                                    iterator.next();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Throwable var9) {
+            //ConsoleLogger.error("next proxy dataProvider error:" + var9, new Object[0]);
+        }
+
     }
 }
