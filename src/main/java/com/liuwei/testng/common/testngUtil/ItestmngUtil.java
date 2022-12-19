@@ -69,7 +69,7 @@ public class ItestmngUtil {
                         Map.Entry<String, Object> entry = (Map.Entry)var9.next();
                         params.put(entry.getKey(), entry.getValue() == null ? "" : String.valueOf(entry.getValue()));
                     }
-
+                    System.out.println("upload params is:"+params.get("batchId")+params.get("executionId"));
                     String result = HttpUtil.post(serverUrl, params);
                     if (StringUtil.isNotEmpty(result)) {
                         JSONObject resultObject = JSONObject.parseObject(result);
