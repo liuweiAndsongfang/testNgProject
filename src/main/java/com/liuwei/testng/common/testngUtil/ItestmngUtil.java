@@ -48,7 +48,7 @@ public class ItestmngUtil {
                     String serverUrl = "http://" + host + "/itestmng/api/uploadResult";
                     boolean success = false;
                     caseObject.put("batchId", batchId);
-                    caseObject.put("executeId", executeId);
+                    caseObject.put("executionId", executeId);
                     caseObject.put("result", status);
                     caseObject.put("testMode", ListenerContext.getExecuteOption().getTestMode());
                     caseObject.put("timeout", testResult.getEndMillis() - testResult.getStartMillis());
