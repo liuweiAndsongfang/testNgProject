@@ -22,6 +22,7 @@ public class AccurateTestListener extends TestListenerAdapter {
     public void onTestSuccess(ITestResult testResult) {
         ConsoleLogger.info("ITestNGListener: ITestListener --> onTestSuccess[" + testResult.getMethod().getRealClass().getName() + "." + testResult.getMethod().getConstructorOrMethod().getName() + "][" + testResult.getMethod().getClass().getName() + "]", new Object[0]);
         JSONObject caseObject = ListenerContext.parseTestCase(testResult);
+        ConsoleLogger.info("parseTestCase finish");
         if (caseObject != null) {
             LogUtils.info(caseObject.toJSONString());
             ClientUtil.uploadCaseResult(caseObject, "SUCCESS", testResult);
