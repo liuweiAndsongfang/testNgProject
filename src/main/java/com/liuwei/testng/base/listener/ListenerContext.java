@@ -88,6 +88,7 @@ public class ListenerContext {
                         caseName = subId;
                     }
                 }
+                ConsoleLogger.info("parseTestCase 4");
                 if (!getSameIds().contains(caseId)) {
                     caseObject = (JSONObject) getCaseMap().get(caseId);
                 } else {
@@ -108,7 +109,7 @@ public class ListenerContext {
                         caseName = caseName + "@" + idx;
                     }
                 }
-
+                ConsoleLogger.info("parseTestCase 5");
                 if (caseObject == null) {
                     caseObject = new JSONObject();
                     caseObject.put("caseType", caseType);
