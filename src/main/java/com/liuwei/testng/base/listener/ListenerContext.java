@@ -73,9 +73,7 @@ public class ListenerContext {
                 caseType = "TESTNG";
                 testNg = (Test) testResult.getMethod().getConstructorOrMethod().getMethod().getAnnotation(Test.class);
                 if (testNg != null) {
-                    ConsoleLogger.info("parseTestCase 1");
                     String subId = parseCaseId(parameters, testResult);
-                    ConsoleLogger.info("parseTestCase 4");
                     if (!"CsvDataProvider".equals(testNg.dataProvider()) && !"YamlDataProvider".equals(testNg.dataProvider())) {
                         if ("ActsDataProvider".equals(testNg.dataProvider())) {
                             caseType = "ACTS";
@@ -110,7 +108,6 @@ public class ListenerContext {
                         caseName = caseName + "@" + idx;
                     }
                 }
-                ConsoleLogger.info("parseTestCase 5");
                 if (caseObject == null) {
                     caseObject = new JSONObject();
                     caseObject.put("caseType", caseType);
@@ -120,14 +117,11 @@ public class ListenerContext {
                     if (!"accurate".equalsIgnoreCase(getExecuteOption().getTestMode())) {
                         getCaseIds().add(caseId);
                     }
-                    ConsoleLogger.info("parseTestCase 2");
-                    ConsoleLogger.info("caseId is"+caseId);
                     if (caseId.matches("^.*@\\d+$")) {
                         getSameIds().add(caseId.substring(0, caseId.lastIndexOf(64)));
                     } else {
                         getSameIds().add(caseId);
                     }
-                    ConsoleLogger.info("parseTestCase 3");
                     if ("V2".equalsIgnoreCase(getExecuteOption().getVersion())) {
                         caseObject.put("caseId", Md5Util.genMD5(caseId + caseType));
                     } else {
@@ -204,44 +198,50 @@ public class ListenerContext {
 
     private static String parseCaseId(Object[] parameters, ITestResult testResult){
         String[] paramNames = parseParamNames(testResult);
-        if(paramNames != null && parameters.length == paramNames.length){
-            List<String> paramNameList = new ArrayList<>(paramNames.length);
+        if (paramNames != null && parameters.length == paramNames.length) {
+            List<String> paramNameList = new ArrayList(paramNames.length);
+
             int idx;
-            for(idx = 0; idx < paramNames.length; ++idx){
-                if(paramNames[idx] == null){
+            for(idx = 0; idx < paramNames.length; ++idx) {
+                if (paramNames[idx] == null) {
                     paramNameList.add("arg" + idx);
-                }else {
+                } else {
                     paramNameList.add(paramNames[idx].toUpperCase());
                 }
             }
+
             idx = paramNameList.indexOf("CASEID");
-            if(idx != -1 && (String.class.isAssignableFrom(parameters[idx].getClass())) || parameters[idx].getClass().isPrimitive() || isWrapClass(parameters[idx].getClass())){
+            if (idx != -1 && (String.class.isAssignableFrom(parameters[idx].getClass()) || parameters[idx].getClass().isPrimitive() || isWrapClass(parameters[idx].getClass()))) {
                 return String.valueOf(parameters[idx]);
             }
+
             idx = paramNameList.indexOf("CASEEXPR");
-            if(idx != -1){
+            if (idx != -1) {
                 String caseExpr = String.valueOf(parameters[idx]);
-                if(caseExpr.contains(";")){
+                if (caseExpr.contains(";")) {
                     return caseExpr.split(";")[0];
                 }
+
                 return caseExpr;
             }
         }
+
         return null;
     }
 
     private static String[] parseParamNames(ITestResult testResult){
         String[] paramNames = null;
-        try{
-            paramNames = SpringMethodUtil.getParameterNames(testResult.getMethod().getConstructorOrMethod().getMethod());
-        }catch (Throwable var5){
-            try{
-                paramNames = JavaAssistUtil.getMethodParamNames(testResult.getMethod().getRealClass(), testResult.getMethod().getMethodName(),testResult.getMethod().getConstructorOrMethod().getParameterTypes());
 
-            }catch (Throwable var4){
+        try {
+            paramNames = SpringMethodUtil.getParameterNames(testResult.getMethod().getConstructorOrMethod().getMethod());
+        } catch (Throwable var5) {
+            try {
+                paramNames = JavaAssistUtil.getMethodParamNames(testResult.getMethod().getRealClass(), testResult.getMethod().getMethodName(), testResult.getMethod().getConstructorOrMethod().getParameterTypes());
+            } catch (Throwable var4) {
                 paramNames = new String[0];
             }
         }
+
         return paramNames;
     }
 
