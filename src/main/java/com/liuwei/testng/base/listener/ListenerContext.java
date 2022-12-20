@@ -3,16 +3,17 @@ package com.liuwei.testng.base.listener;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.liuwei.testng.base.LogUtils;
 import com.liuwei.testng.common.JavaAssistUtil;
 import com.liuwei.testng.common.SpringMethodUtil;
 import com.liuwei.testng.common.StringUtil;
 import com.liuwei.testng.common.testngUtil.ClientUtil;
 import com.liuwei.testng.common.testngUtil.ConsoleLogger;
 import com.liuwei.testng.common.testngUtil.Md5Util;
-import java.lang.String;
-import org.testng.annotations.Test;
-import com.liuwei.testng.base.LogUtils;
+import com.liuwei.testng.common.testngUtil.TracerIdUtil;
 import org.testng.ITestResult;
+import org.testng.annotations.Test;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -55,88 +56,93 @@ public class ListenerContext {
     }
 
     public static synchronized JSONObject parseTestCase(ITestResult testResult){
-        if(testResult.getAttribute("currentCase") != null){
+        if (testResult.getAttribute("currentCase") != null) {
             return (JSONObject)testResult.getAttribute("currentCase");
-        }else {
+        } else {
             Object[] parameters = testResult.getParameters();
-            JSONObject caseObject = null;
             String caseType = null;
+            JSONObject caseObject = null;
             Test testNg = null;
-            try{
+            try {
                 String caseName = null;
                 String testMethod = testResult.getMethod().getRealClass().getSimpleName() + "." + testResult.getMethod().getMethodName();
-                String casePath = testResult.getMethod().getRealClass().getSimpleName() + "." + testResult.getMethod().getMethodName();
+                String casePath = testResult.getMethod().getRealClass().getName() + "." + testResult.getMethod().getMethodName();
                 String caseId = null;
                 caseId = casePath;
                 caseName = testMethod;
                 caseType = "TESTNG";
                 testNg = (Test) testResult.getMethod().getConstructorOrMethod().getMethod().getAnnotation(Test.class);
-                if(testNg != null){
-                    String subId = parseCaseId(parameters,testResult);
-                    if(!"CsvDataProvider".equals(testNg.dataProvider()) && !"YamlDataProvider".equals(testNg.dataProvider())){
-                        if("ActsDataProvider".equals(testNg.dataProvider())){
+                if (testNg != null) {
+                    String subId = parseCaseId(parameters, testResult);
+                    if (!"CsvDataProvider".equals(testNg.dataProvider()) && !"YamlDataProvider".equals(testNg.dataProvider())) {
+                        if ("ActsDataProvider".equals(testNg.dataProvider())) {
                             caseType = "ACTS";
-                        }else {
-                            caseType = "ATS";
                         }
-                        if(subId != null){
-                            caseId = casePath +"."+ subId;
-                            caseName = subId;
-                        }
-                    }
-                    if(!getSameIds().contains(caseId)){
-                        caseObject = (JSONObject) getCaseMap().get(caseId);
-                    }else {
-                        int idx = 0;
-                        JSONObject tempCase = (JSONObject)getCaseMap().get(caseId);
-                        if(tempCase != null && tempCase.getBoolean("isRun") != null){
-                            idx = 1;
-                            for (tempCase = (JSONObject) getCaseMap().get(caseId + "@" +idx); tempCase != null && tempCase.getBoolean("isRun") != null; tempCase = (JSONObject)getCaseMap().get(caseId +"@"+ idx)){
-                                ++idx;
-                            }
-                            caseObject = tempCase;
-                        }
-                        if (idx != 0){
-                            caseId = caseId + "@" + idx;
-                            caseName = caseName + "@" + idx;
-                        }
+                    } else {
+                        caseType = "ATS";
                     }
 
-                    if(caseObject == null){
-                        caseObject = new JSONObject();
-                        caseObject.put("caseType",caseType);
-                        caseObject.put("traceId",System.currentTimeMillis()+"");
-                        caseObject.put("batchId",getBatchId());
-                        getCaseMap().put(caseId, caseObject);
-                        if(!"accurate".equalsIgnoreCase(getExecuteOption().getTestMode())){
-                            getCaseIds().add(caseId);
-                        }
-                        if(caseId.matches("^.*@\\d+$")){
-                            getSameIds().add(caseId.substring(0,caseId.lastIndexOf(64)));
-                        }else {
-                            getSameIds().add(caseId);
-                        }
-
-                        if("V2".equalsIgnoreCase(getExecuteOption().getVersion())){
-                            caseObject.put("caseId", Md5Util.genMD5(caseId + caseType));
-                        }else {
-                            caseObject.put("caseId",caseId);
-                        }
-                    }
-                    if(caseObject != null){
-                        //这里需要加上执行id
-                        caseObject.put("executionId",getExecutionId());
-                        caseObject.put("caseName",caseName);
-                        caseObject.put("testMethod",testMethod);
-                        caseObject.put("casePath",casePath);
-                        caseObject.put("isRun",true);
+                    if (subId != null) {
+                        caseId = casePath + "." + subId;
+                        caseName = subId;
                     }
                 }
+                if (!getSameIds().contains(caseId)) {
+                    caseObject = (JSONObject) getCaseMap().get(caseId);
+                } else {
+                    int idx = 0;
+                    JSONObject tempCase = (JSONObject) getCaseMap().get(caseId);
+                    if (tempCase != null && tempCase.getBoolean("isRun") != null) {
+                        idx = 1;
+
+                        for (tempCase = (JSONObject) getCaseMap().get(caseId + "@" + idx); tempCase != null && tempCase.getBoolean("isRun") != null; tempCase = (JSONObject) getCaseMap().get(caseId + "@" + idx)) {
+                            ++idx;
+                        }
+
+                        caseObject = tempCase;
+                    }
+
+                    if (idx != 0) {
+                        caseId = caseId + "@" + idx;
+                        caseName = caseName + "@" + idx;
+                    }
+                }
+
+                if (caseObject == null) {
+                    caseObject = new JSONObject();
+                    caseObject.put("caseType", caseType);
+                    caseObject.put("traceId", TracerIdUtil.generate());
+                    caseObject.put("batchId", getBatchId());
+                    getCaseMap().put(caseId, caseObject);
+                    if (!"accurate".equalsIgnoreCase(getExecuteOption().getTestMode())) {
+                        getCaseIds().add(caseId);
+                    }
+
+                    if (caseId.matches("^.*@\\d+$")) {
+                        getSameIds().add(caseId.substring(0, caseId.lastIndexOf(64)));
+                    } else {
+                        getSameIds().add(caseId);
+                    }
+
+                    if ("V2".equalsIgnoreCase(getExecuteOption().getVersion())) {
+                        caseObject.put("caseId", Md5Util.genMD5(caseId + caseType));
+                    } else {
+                        caseObject.put("caseId", caseId);
+                    }
+                }
+                if (caseObject != null) {
+                    //这里需要加入执行id
+                    caseObject.put("executionId", getExecutionId());
+                    caseObject.put("caseName", caseName);
+                    caseObject.put("testMethod", testMethod);
+                    caseObject.put("casePath", casePath);
+                    caseObject.put("isRun", true);
+                }
             }catch (Exception e){
-                LogUtils.info("parse testcase failed, testcase=[" + testResult.getMethod().getTestClass().getName() + "." + testResult.getMethod().getMethodName()+ "], e=[" + e == null? "null":e.getClass().getName() + "#" +e.getMessage() +"]");
+                LogUtils.info("parse testcase failed, testcase=[" + testResult.getMethod().getTestClass().getName() + "." + testResult.getMethod().getMethodName() + "], e=[" + e == null ? "null" : e.getClass().getName() + "#" + e.getMessage() + "]");
             }
-            if(caseObject != null){
-                testResult.setAttribute("currentCase",caseObject);
+            if (caseObject != null) {
+                testResult.setAttribute("currentCase", caseObject);
                 testResult.setAttribute("caseId", caseObject.getString("caseId"));
             }
             return caseObject;

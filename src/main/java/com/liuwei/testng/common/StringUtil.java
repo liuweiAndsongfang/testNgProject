@@ -1,6 +1,7 @@
 package com.liuwei.testng.common;
+import org.apache.commons.lang3.StringUtils;
 
-public class StringUtil {
+public class StringUtil extends StringUtils{
 
     public static String subStingAfter(String str, String separator){
         if(str != null && str.length() != 0){

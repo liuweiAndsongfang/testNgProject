@@ -18,7 +18,7 @@ import java.util.Map;
 public class AccurateInvokedMethodListener implements IInvokedMethodListener {
     @Override
     public void beforeInvocation(IInvokedMethod iInvokedMethod, ITestResult testResult) {
-        if (this.isTestCase(iInvokedMethod, testResult)) {
+        if (isTestCase(iInvokedMethod, testResult)) {
             ConsoleLogger.info("ITestNGListener: IInvokedMethodListener --> beforeInvocation[" + testResult.getMethod().getRealClass().getName() + "." + testResult.getMethod().getConstructorOrMethod().getMethod().getName() + "][" + testResult.getMethod().getClass().getName() + "]", new Object[0]);
             JSONObject caseObject = ListenerContext.parseTestCase(testResult);
             if (this.skipTest(caseObject)) {
@@ -46,7 +46,7 @@ public class AccurateInvokedMethodListener implements IInvokedMethodListener {
         } else if ("accurate".equalsIgnoreCase(ListenerContext.getExecuteOption().getTestMode())) {
             return this.skipAccurateTest(caseObject);
         } else {
-            return "remote".equalsIgnoreCase(ListenerContext.getExecuteOption().getTestMode()) ? this.skipRemoteTest(caseObject) : false;
+            return "remote".equalsIgnoreCase(ListenerContext.getExecuteOption().getTestMode()) ? skipRemoteTest(caseObject) : false;
         }
     }
 

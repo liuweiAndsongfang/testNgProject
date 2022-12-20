@@ -92,6 +92,7 @@
                 <!--总pom里的版本建议定义成2.12.4，使用2.8.1版本时部分系统出现reporter类找不到的异常 -->
                 <version>2.12.4</version>
                 <configuration>
+                    <skipTests>false</skipTests>
                     <!--加入下列argLine参数定义帮解决了hudson运行接口测试时可能引起的内存溢出的问题 -->
                     <argLine>-Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=256m
                         <!--  ${coverageAgent} -->
