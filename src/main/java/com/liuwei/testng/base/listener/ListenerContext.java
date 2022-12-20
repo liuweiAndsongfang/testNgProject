@@ -73,6 +73,7 @@ public class ListenerContext {
                 caseType = "TESTNG";
                 testNg = (Test) testResult.getMethod().getConstructorOrMethod().getMethod().getAnnotation(Test.class);
                 if (testNg != null) {
+                    ConsoleLogger.info("parseTestCase 1");
                     String subId = parseCaseId(parameters, testResult);
                     if (!"CsvDataProvider".equals(testNg.dataProvider()) && !"YamlDataProvider".equals(testNg.dataProvider())) {
                         if ("ActsDataProvider".equals(testNg.dataProvider())) {
@@ -117,13 +118,14 @@ public class ListenerContext {
                     if (!"accurate".equalsIgnoreCase(getExecuteOption().getTestMode())) {
                         getCaseIds().add(caseId);
                     }
-
+                    ConsoleLogger.info("parseTestCase 2");
+                    ConsoleLogger.info("caseId is"+caseId);
                     if (caseId.matches("^.*@\\d+$")) {
                         getSameIds().add(caseId.substring(0, caseId.lastIndexOf(64)));
                     } else {
                         getSameIds().add(caseId);
                     }
-
+                    ConsoleLogger.info("parseTestCase 3");
                     if ("V2".equalsIgnoreCase(getExecuteOption().getVersion())) {
                         caseObject.put("caseId", Md5Util.genMD5(caseId + caseType));
                     } else {
