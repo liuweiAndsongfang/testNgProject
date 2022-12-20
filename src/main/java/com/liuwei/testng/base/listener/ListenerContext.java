@@ -75,6 +75,7 @@ public class ListenerContext {
                 if (testNg != null) {
                     ConsoleLogger.info("parseTestCase 1");
                     String subId = parseCaseId(parameters, testResult);
+                    ConsoleLogger.info("parseTestCase 4");
                     if (!"CsvDataProvider".equals(testNg.dataProvider()) && !"YamlDataProvider".equals(testNg.dataProvider())) {
                         if ("ActsDataProvider".equals(testNg.dataProvider())) {
                             caseType = "ACTS";
@@ -88,7 +89,7 @@ public class ListenerContext {
                         caseName = subId;
                     }
                 }
-                ConsoleLogger.info("parseTestCase 4");
+
                 if (!getSameIds().contains(caseId)) {
                     caseObject = (JSONObject) getCaseMap().get(caseId);
                 } else {
